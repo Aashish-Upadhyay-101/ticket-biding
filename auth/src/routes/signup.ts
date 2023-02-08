@@ -19,7 +19,12 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).send({ errors: errors.array() });
     }
-    res.send("hello there");
+
+    const { email, password } = req.body;
+
+    console.log("Creating a new user...");
+
+    res.send({});
   }
 );
 
