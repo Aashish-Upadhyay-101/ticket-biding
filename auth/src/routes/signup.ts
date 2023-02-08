@@ -1,5 +1,6 @@
 import express, { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
+import { signupController } from "../controllers/authController";
 
 const router: Router = express.Router();
 
@@ -14,19 +15,7 @@ router.post(
         "Password must be at least 4 characters long and at most 20 characters long"
       ),
   ],
-  (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      // return res.status(400).send({ errors: errors.array() });
-      throw new Error("Invalid email or password");
-    }
-
-    const { email, password } = req.body;
-
-    console.log("Creating a new user...");
-
-    res.send({});
-  }
+  signupController
 );
 
 export { router as signupRouter };
