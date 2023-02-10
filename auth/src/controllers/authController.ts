@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { RequestValidationError } from "../errors/request-validation-error";
-import { DatabaseConnectionError } from "../errors/database-connection-error";
 
 export const signupController = (req: Request, res: Response) => {
   const errors = validationResult(req);
