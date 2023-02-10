@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import "express-async-errors"
 import { json } from "body-parser";
 import { currentUserRouter } from "./routes/current-user";
 import { signinRouter } from "./routes/signin";
@@ -19,7 +20,9 @@ app.use(currentUserRouter);
 app.use(signinRouter);
 app.use(signoutRouter);
 app.use(signupRouter);
-app.all("*", () => {
+
+// unhandled routes
+app.all("*", async () => {
   throw new NotFoundError();
 })
 
