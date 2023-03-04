@@ -10,7 +10,7 @@ import { NotFoundError } from "./errors/not-found-error";
 
 const app: Express = express();
 
-const port = "8080";
+const port = "3000";
 
 // middlewares
 app.use(json());
