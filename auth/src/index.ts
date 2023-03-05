@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import mongoose from "mongoose";
 import "express-async-errors"
 import { json } from "body-parser";
 import { currentUserRouter } from "./routes/current-user";
@@ -29,6 +30,18 @@ app.all("*", async () => {
 // global error handler
 app.use(globalErrorHandler);
 
+const start = async () => {
+  try {
+    await mongoose.connect('mongodb://auth-mongo-srv:27017/')
+    console.log("connected to database!");
+    
+  }catch (err) {
+    console.log(err);
+  }
+}
+
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
 });
+
+start()
