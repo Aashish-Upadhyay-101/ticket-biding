@@ -1,16 +1,10 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { RequestValidationError } from "../errors/request-validation-error";
 import { User } from "../models/user";
 import { BadRequestError } from "../errors/bad-request-error";
-import jwt from "jsonwebtoken";
+import { authJwtToken, authPayloadDecoder } from "../services/jwtController";
+import { Password } from "../services/password";
 
 export const signupController = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new RequestValidationError(errors.array());
-  }
-
   const { email, password } = req.body;
   const existingUser = await User.findOne({ email });
   
@@ -24,13 +18,10 @@ export const signupController = async (req: Request, res: Response) => {
   await newUser.save();
 
   // generate jwt 
-  const userJwtToken = jwt.sign(
-    {
-      id: newUser.id,
-      email: newUser.email,
-    }, 
-      process.env.JWT_KEY!
-    )
+  const userJwtToken = authJwtToken({
+    id: newUser.id,
+    email: newUser.email,
+  })
 
   // store it on session object
   req.session = {
@@ -42,8 +33,44 @@ export const signupController = async (req: Request, res: Response) => {
   })
 };
 
-export const signinController = (req: Request, res: Response) => {};
+export const signinController = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-export const signoutController = (req: Request, res: Response) => {};
+  const existingUser = await User.findOne({ email });
+  if (!existingUser){
+    throw new BadRequestError("Invalid email");
+  }
 
-export const currentUserController = (req: Request, res: Response) => {};
+  const isPasswordMatched = await Password.compare(existingUser.password, password);
+  if (!isPasswordMatched) {
+    throw new BadRequestError("Invalid password");
+  }
+
+  // generate jwt 
+  const userJwtToken = authJwtToken({
+    id: existingUser.id,
+    email: existingUser.email,
+  })
+
+  req.session = {
+    jwt: userJwtToken
+  }
+
+  res.status(200).json({
+    existingUser
+  })
+
+};
+
+export const currentUserController = (req: Request, res: Response) => {
+  res.send({
+    currentUser: req.currentUser,
+  })
+};
+
+export const signoutController = (req: Request, res: Response) => {
+  req.session = null;
+
+  return res.status(200).json({})
+};
+

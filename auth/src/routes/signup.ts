@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import { body, validationResult } from "express-validator";
 import { signupController } from "../controllers/authController";
+import { validateRequest } from "../middlewares/validate-request";
 
 const router: Router = express.Router();
 
@@ -15,6 +16,7 @@ router.post(
         "Password must be at least 4 characters long and at most 20 characters long"
       ),
   ],
+  validateRequest,
   signupController
 );
 
