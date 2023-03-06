@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { Password } from '../services/password';
 
 interface UserAttrs {
     email: string;
@@ -23,7 +24,24 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     }
+},{
+    toJSON: {
+        transform(doc, ret){
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.password;
+            delete ret.__v;
+        }
+    }
 });
+
+userSchema.pre('save', async function(next) {
+    if (this.isModified('password')) {
+        const hashedPassword = await Password.toHash(this.get('password'));
+        this.set('password', hashedPassword);
+    }
+    next();
+})
 
 userSchema.statics.createUser = function(attrs: UserAttrs) {
     return new User(attrs);
@@ -31,9 +49,5 @@ userSchema.statics.createUser = function(attrs: UserAttrs) {
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
-User.build({
-    email: "hbeing427@gmail.com",
-    password: "hahahahahaha",
-})
 
 export { User };
