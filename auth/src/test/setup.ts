@@ -4,7 +4,12 @@ import { app } from "../app";
 
 let mongod: any;
 beforeAll(async () => {
+    process.env.JWT_KEY = "adsafkja";
+
     mongod = new MongoMemoryServer();
+
+    await mongod.start();
+
     const mongoUri = await mongod.getUri();
     
     await mongoose.connect(mongoUri);
