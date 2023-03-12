@@ -5,7 +5,11 @@ import { requireAuth } from "../middlewares/require-auth";
 
 const router: Router = express.Router();
 
-router.get("/api/users/currentuser", currentUser, requireAuth, currentUserController);
+router.get(
+  "/api/users/currentuser",
+  currentUser,
+  requireAuth,
+  currentUserController
+);
 
 export { router as currentUserRouter };
- 
